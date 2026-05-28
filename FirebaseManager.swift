@@ -17,7 +17,6 @@ class FirebaseManager {
     // додати продукт
     func addProduct(
         nameEN: String,
-        nameRU: String,
         nameUK: String,
         calories: Double,
         protein: Double,
@@ -27,7 +26,6 @@ class FirebaseManager {
 
         let data: [String: Any] = [
             "name_en": nameEN,
-            "name_ru": nameRU,
             "name_uk": nameUK,
             "calories": calories,
             "protein": protein,
