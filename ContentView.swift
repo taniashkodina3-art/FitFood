@@ -162,7 +162,6 @@ final class LocalSQLiteManager {
     
     func addFood(
         nameEN: String,
-        nameRU: String,
         nameUK: String,
         calories: Double,
         protein: Double,
@@ -174,7 +173,7 @@ final class LocalSQLiteManager {
         
         let sql = """
         INSERT INTO foods
-        (name_en, name_ru, name_uk, calories, protein, fat, carbs)
+        (name_en, name_uk, calories, protein, fat, carbs)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         """
         
@@ -183,7 +182,6 @@ final class LocalSQLiteManager {
         if sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK {
             
             sqlite3_bind_text(statement, 1, nameEN, -1, SQLITE_TRANSIENT)
-            sqlite3_bind_text(statement, 2, nameRU, -1, SQLITE_TRANSIENT)
             sqlite3_bind_text(statement, 3, nameUK, -1, SQLITE_TRANSIENT)
             
             sqlite3_bind_double(statement, 4, calories)
@@ -197,7 +195,6 @@ final class LocalSQLiteManager {
         sqlite3_finalize(statement)
         FirebaseManager.shared.addProduct(
             nameEN: nameEN,
-            nameRU: nameRU,
             nameUK: nameUK,
             calories: calories,
             protein: protein,
@@ -471,7 +468,7 @@ struct ContentView: View {
             let fat = item["fat"] as? Double ?? 0
             let carbs = item["carbs"] as? Double ?? 0
 
-            let allNames = [nameUK, nameRU, nameEN]
+            let allNames = [nameUK, nameEN]
             let matches = allNames.contains { $0.localizedCaseInsensitiveContains(query) }
 
             guard matches else { return nil }
@@ -545,28 +542,6 @@ struct ContentView: View {
         }
     }
 
-    func translateQueryForFatSecret(_ query: String) -> String {
-        let dict: [String: String] = [
-            "сир": "cheese",
-            "яблуко": "apple",
-            "курка": "chicken",
-            
-            "яйце": "egg",
-            "рис": "rice",
-            "банан": "banana",
-            "вівсянка": "oatmeal",
-            "творог": "cottage cheese",
-            "картопля": "potato",
-            "хліб": "bread",
-            "масло": "butter",
-            "йогурт": "yogurt",
-            "гречка": "buckwheat",
-            "сыр": "cheese",
-            "яблоко": "apple",
-            "курица": "chicken",
-            "картошка": "potato",
-            "хлеб": "bread",
-            "молоко": "milk"
         ]
 
         return dict[query.lowercased()] ?? query
@@ -1244,10 +1219,6 @@ func formatNumber(_ value: Double) -> String {
             return "uk"
         }
 
-        if text.range(of: "[а-яА-Я]", options: .regularExpression) != nil {
-            return "ru"
-        }
-
         return "en"
     }
 struct AddFoodView: View {
@@ -1331,7 +1302,6 @@ struct AddFoodView: View {
 
                         LocalSQLiteManager.shared.addFood(
                             nameEN: name,
-                            nameRU: name,
                             nameUK: name,
                             calories: c,
                             protein: p,
